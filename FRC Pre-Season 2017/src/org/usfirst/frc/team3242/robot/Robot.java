@@ -2,6 +2,9 @@
 package org.usfirst.frc.team3242.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Jaguar;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +21,16 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     String autoSelected;
     SendableChooser chooser;
+    
+    Joystick controller  = new Joystick(0);
+    Jaguar motorOne = new Jaguar(1);
+    Jaguar motorTwo = new Jaguar(2);
+    Jaguar motorThree = new Jaguar(3);
+    Jaguar motorFour = new Jaguar(4);
+    RobotDrive driver = new RobotDrive(1, 2, 3, 4); 
+    
+    double xAxis;
+    double yAxis;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -28,7 +41,9 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
-    }
+        
+       
+        }
     
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
@@ -63,8 +78,12 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during operator control
      */
+   
     public void teleopPeriodic() {
-        
+    	xAxis = controller.getRawAxis(0);
+    	yAxis = controller.getRawAxis(1);
+    	driver.arcadeDrive(yAxis, xAxis);
+    	
     }
     
     /**
