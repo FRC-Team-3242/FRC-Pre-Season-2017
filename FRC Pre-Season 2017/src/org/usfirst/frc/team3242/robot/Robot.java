@@ -2,7 +2,7 @@
 package org.usfirst.frc.team3242.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Jaguar;
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,11 +23,11 @@ public class Robot extends IterativeRobot {
     SendableChooser chooser;
     
     Joystick controller  = new Joystick(0);
-    Jaguar motorOne = new Jaguar(1);
-    Jaguar motorTwo = new Jaguar(2);
-    Jaguar motorThree = new Jaguar(3);
-    Jaguar motorFour = new Jaguar(4);
-    RobotDrive driver = new RobotDrive(1, 2, 3, 4); 
+    CANTalon motorOne = new CANTalon(1);
+    CANTalon motorTwo = new CANTalon(2);
+    CANTalon motorThree = new CANTalon(3);
+    CANTalon motorFour = new CANTalon(4);
+    RobotDrive driver = new RobotDrive(4, 3, 1, 2); 
     
     double xAxis;
     double yAxis;
