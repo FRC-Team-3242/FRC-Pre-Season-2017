@@ -1,13 +1,18 @@
-
 package org.usfirst.frc.team3242.robot;
+
+
+
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.RobotDrive.MotorType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Relay.Value;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,15 +27,25 @@ public class Robot extends IterativeRobot {
     String autoSelected;
     SendableChooser chooser;
     
-    Joystick controller  = new Joystick(0);
-    CANTalon motorOne = new CANTalon(1);
-    CANTalon motorTwo = new CANTalon(2);
-    CANTalon motorThree = new CANTalon(3);
-    CANTalon motorFour = new CANTalon(4);
-    RobotDrive driver = new RobotDrive(4, 3, 1, 2); 
+    Joystick controller;
+    CANTalon motorOne;
+    CANTalon motorTwo;
+    CANTalon motorThree;
+    CANTalon motorFour;
+    CANTalon motorFive;
+    CANTalon motorSix;
+    RobotDrive driver; 
+    Relay actuator;
     
-    double xAxis;
-    double yAxis;
+    double rTrigger;
+    double lTrigger;
+    double xAxisLeft;
+    double yAxisLeft;
+    double xAxisRight;
+    
+    boolean rBumper;
+    boolean lBumper;
+    
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -42,7 +57,20 @@ public class Robot extends IterativeRobot {
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
         
+        controller  = new Joystick(0);
+        motorOne = new CANTalon(1);
+        motorTwo = new CANTalon(2);
+        motorThree = new CANTalon(3);
+        motorFour = new CANTalon(4);
+        motorFive = new CANTalon(5);
+        motorSix = new CANTalon(6);
+        actuator = new Relay(2);
        
+        driver = new RobotDrive(motorFour, motorThree, motorOne, motorTwo);
+        
+        driver.setInvertedMotor(MotorType.kRearLeft, true);
+        driver.setInvertedMotor(MotorType.kFrontLeft, true);
+        
         }
     
 	/**
@@ -80,10 +108,37 @@ public class Robot extends IterativeRobot {
      */
    
     public void teleopPeriodic() {
-    	xAxis = controller.getRawAxis(0);
-    	yAxis = controller.getRawAxis(1);
-    	driver.arcadeDrive(yAxis, xAxis);
+    	xAxisLeft = controller.getRawAxis(0);
+    	yAxisLeft = controller.getRawAxis(1);
+    	xAxisRight = controller.getRawAxis(4);
+    	rTrigger = controller.getRawAxis(3);
+    	lTrigger = controller.getRawAxis(2);
+    	rBumper = controller.getRawButton(6);
+    	lBumper = controller.getRawButton(5);
     	
+    	driver.mecanumDrive_Cartesian(xAxisRight * -1, yAxisLeft * -1, xAxisLeft * -1 , 0);
+    	
+    	if (rTrigger > 0) {
+    		motorFive.set(rTrigger);
+    		motorSix.set(rTrigger);
+    	}
+    	else if (lTrigger > 0) {
+    		motorFive.set(lTrigger * -1);
+    		motorSix.set(lTrigger * -1);
+    	}
+    	else {
+    		motorFive.set(0);
+    		motorSix.set(0);
+    	}
+    	if (rBumper){
+    		actuator.set(Relay.Value.kForward);
+    	}
+    	else if (lBumper){
+    		actuator.set(Relay.Value.kReverse);
+    	}
+    	else{
+    		actuator.set(Relay.Value.kOff);
+    	}
     }
     
     /**
