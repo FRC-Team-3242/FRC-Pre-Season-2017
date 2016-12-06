@@ -1,5 +1,3 @@
-package org.usfirst.frc.team3242.robot;
-
 
 
 
@@ -12,7 +10,7 @@ import edu.wpi.first.wpilibj.RobotDrive.MotorType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Relay.Value;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -36,17 +34,19 @@ public class Robot extends IterativeRobot {
     CANTalon motorSix;
     RobotDrive driver; 
     Relay actuator;
+    Timer timer;
     
+    double expIncrease;
     double rTrigger;
     double lTrigger;
     double xAxisLeft;
     double yAxisLeft;
     double xAxisRight;
-    
     boolean rBumper;
     boolean lBumper;
+    double time;
+    int armCount;
     
-	
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -65,8 +65,8 @@ public class Robot extends IterativeRobot {
         motorFive = new CANTalon(5);
         motorSix = new CANTalon(6);
         actuator = new Relay(2);
-       
-        driver = new RobotDrive(motorFour, motorThree, motorOne, motorTwo);
+        
+        driver = new RobotDrive(4, 3, 1, 2); 
         
         driver.setInvertedMotor(MotorType.kRearLeft, true);
         driver.setInvertedMotor(MotorType.kFrontLeft, true);
@@ -86,21 +86,57 @@ public class Robot extends IterativeRobot {
     	autoSelected = (String) chooser.getSelected();
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
+		
+		timer.start();
+		armCount = 0;
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	switch(autoSelected) {
+    	 switch(autoSelected) {
     	case customAuto:
-        //Put custom auto code here   
+    		time = timer.get();
+      	  while (armCount < 4){  
+          	while(time < 2){
+          		driver.drive(0.1, 0);
+          	}
+          	while(time > 2 && time < 3){
+          		driver.drive(0, 0.1);
+          	}
+          	while(time > 3 && time < 4){
+          		driver.drive(0.1, 0);
+          	}
+          		driver.drive(0, 0);
+          		timer.reset();
+          		
+          	while(time < 2){
+          		driver.drive(-0.1, 0);
+          	}
+          	while(time > 2 && time < 3){
+          		driver.drive(0, -0.1);
+          	}
+          	while(time > 3 && time < 4){
+          		driver.drive(-0.1, 0);
+          	}
+          	while(time > 4 && time <5){
+          		driver.drive(0, 0.1);
+          		timer.reset();
+          		armCount ++;
+          	}
+          	timer.stop();
+      	  }
+           
             break;
     	case defaultAuto:
+    		
+  
     	default:
     	//Put default auto code here
-            break;
+            break; 
     	}
+    	
     }
 
     /**
@@ -115,30 +151,36 @@ public class Robot extends IterativeRobot {
     	lTrigger = controller.getRawAxis(2);
     	rBumper = controller.getRawButton(6);
     	lBumper = controller.getRawButton(5);
+    	expIncrease = 0;
     	
-    	driver.mecanumDrive_Cartesian(xAxisRight * -1, yAxisLeft * -1, xAxisLeft * -1 , 0);
     	
-    	if (rTrigger > 0) {
-    		motorFive.set(rTrigger);
-    		motorSix.set(rTrigger);
+    	/*while (rTrigger > 0 && rTrigger < 1) {
+    		motorFive.set(expIncrease);
+    		motorSix.set(expIncrease);
+    		expIncrease = expIncrease + 0.05;
     	}
-    	else if (lTrigger > 0) {
-    		motorFive.set(lTrigger * -1);
-    		motorSix.set(lTrigger * -1);
+    	while (lTrigger > 0) {
+    		motorFive.set(expIncrease * -1);
+    		motorSix.set(expIncrease * -1);
     	}
-    	else {
+    	else{
     		motorFive.set(0);
     		motorSix.set(0);
     	}
+    	
     	if (rBumper){
     		actuator.set(Relay.Value.kForward);
     	}
-    	else if (lBumper){
+    	if (lBumper){
     		actuator.set(Relay.Value.kReverse);
     	}
-    	else{
-    		actuator.set(Relay.Value.kOff);
+    	if(xAxisLeft > 0.05 && yAxisLeft < -0.05 && xAxisRight < -0.05){
+    	driver.mecanumDrive_Cartesian(xAxisLeft, yAxisLeft * -1, xAxisRight * -1 , 0);
     	}
+    	else{
+    		driver.mecanumDrive_Cartesian(0, 0, 0, 0);
+    	}
+    	*/
     }
     
     /**
